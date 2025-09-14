@@ -52,7 +52,7 @@ class ReviewState(TypedDict):
 # --- Nodes ---
 def find_sentiment(state: ReviewState):
     result = sentiment_chain.invoke({
-        "review": state["review"],
+        "review": f'For the following review find out the sentiment \n {state["review"]}',
         "format_instructions": parser1.get_format_instructions()
     })
     return {"sentiment": result.sentiment}
@@ -69,16 +69,18 @@ Also, kindly ask the user to leave feedback on our website."""
 
 def run_diagnosis(state: ReviewState):
     result = diagnosis_chain.invoke({
-        "review": state["review"],
+        "review": f"""Diagnose this negative review:\n\n{state['review']}\n"
+    "Return issue_type, tone, and urgency.
+""",
         "format_instructions": parser2.get_format_instructions()
     })
     return {"diagnosis": result.model_dump()}
 
 def negative_response(state: ReviewState):
-    diag = state["diagnosis"]
-    prompt = f"""Write a polite apology and assure the user their issue will be addressed.
-    Review: "{state['review']}"
-    Diagnosis: {diag}
+    diagnosis  = state["diagnosis"]
+    prompt = f"""You are a support assistant.
+    The user had a '{diagnosis['issue_type']}' issue, sounded '{diagnosis['tone']}', and marked urgency as '{diagnosis['urgency']}'.
+    Write an empathetic, helpful resolution message.
     """
     response = model.invoke(prompt).content
     return {"response": response}
@@ -98,3 +100,10 @@ graph.add_edge("run_diagnosis", "negative_response")
 graph.add_edge("negative_response", END)
 
 workflow = graph.compile()
+
+# --- Run Workflow ---
+initial_state = {
+    "review": "I’ve been trying to log in for over an hour now, and the app keeps freezing on the authentication screen. I even tried reinstalling it, but no luck. This kind of bug is unacceptable, especially when it affects basic functionality."
+}
+final_state = workflow.invoke(initial_state)
+print(final_state)
