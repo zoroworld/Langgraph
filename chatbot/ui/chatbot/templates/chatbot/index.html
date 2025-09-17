@@ -1,0 +1,61 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>Chatbot UI — ChatGPT-like</title>
+	<!--	for local static-->
+	<link rel="stylesheet" href="{% static 'chatbot/css/style.css' %}">
+	<!--	for global static-->
+	<!--	<link rel="stylesheet" href="{% static 'css/style.css' %}">-->
+</head>
+<body>
+<div class="app">
+	<aside class="sidebar">
+		<div class="brand">
+			<div class="logo">AI</div>
+			<div>
+				<h1>MiniGPT</h1>
+				<div style="font-size:12px;color:var(--muted)">Chat-like UI</div>
+			</div>
+		</div>
+		<button class="new-chat">+ New chat</button>
+		<div class="conversations">
+			<div class="conv">
+				<div class="icon">💬</div>
+				<div>Welcome chat</div>
+			</div>
+			<div class="conv">
+				<div class="icon">📚</div>
+				<div>Docs helper</div>
+			</div>
+		</div>
+	</aside>
+	<main class="main">
+		<div class="main-header">
+			<div class="header-left">
+				<h2 style="margin:0">Conversation</h2>
+				<div style="margin-left:10px;color:var(--muted);font-size:13px">Ask anything — demo UI</div>
+			</div>
+			<div style="color:var(--muted);font-size:13px">Connected</div>
+		</div>
+
+		<section class="chat-area" id="chat">
+			<!-- sample bot message -->
+		</section>
+
+		<div class="composer form-container">
+			<form id="chat-form"  method="post">
+				{% csrf_token %}
+				{{ form.message }}
+				<button id="send" class="send-btn" type="submit">Send</button>
+			</form>
+		</div>
+
+	</main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="{% static 'chatbot/js/index.js' %}"></script>
+</body>
+</html>
